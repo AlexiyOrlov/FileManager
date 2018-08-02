@@ -3,6 +3,7 @@ package org.knowbase.file.browser;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -21,6 +22,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 
 public class FileBrowser extends Application {
@@ -90,6 +92,7 @@ public class FileBrowser extends Application {
 
 
                 ArrayList<Node> buffer = new ArrayList<>(browsingTab.getElementPane().getChildren());
+                buffer.removeIf(node -> node instanceof Separator);
                 browsingTab.getElementPane().getChildren().clear();
                 buffer.sort((o1, o2) -> {
                     if (o1 instanceof Button && !(o2 instanceof Button))
@@ -102,6 +105,7 @@ public class FileBrowser extends Application {
                         return ((Button) o1).getText().compareTo(((Button) o2).getText());
                     return 0;
                 });
+
                 browsingTab.getElementPane().getChildren().addAll(buffer);
 
 
@@ -131,6 +135,33 @@ public class FileBrowser extends Application {
                         return ((Button) o1).getText().compareTo(((Button) o2).getText());
                     return 0;
                 });
+
+                ArrayList<Integer> insertionPoints=new ArrayList<>();
+                for (int i = 0; i < nodes.size(); i++) {
+                    Node current=nodes.get(i);
+                    if(i+1<nodes.size())
+                    {
+                        Node next=nodes.get(i+1);
+                        if(current instanceof Text && next instanceof Text)
+                        {
+                            String t=((Text) current).getText();
+                            String text2=((Text) next).getText();
+                            if(t.contains(".") && text2.contains("."))
+                            {
+                                String ext=t.substring(t.lastIndexOf('.')+1);
+                                String e2=text2.substring(text2.lastIndexOf('.')+1);
+                                if(!ext.equals(e2))
+                                {
+                                    insertionPoints.add(i+1);
+                                }
+                            }
+                        }
+                    }
+                }
+                Collections.reverse(insertionPoints);
+                for (Integer integer : insertionPoints) {
+                    nodes.add(integer, new Separator(Orientation.HORIZONTAL));
+                }
                 browsingTab.getElementPane().getChildren().addAll(nodes);
 
 

@@ -1,7 +1,10 @@
 package org.knowbase.file.browser;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import org.knowbase.Alert2;
@@ -11,6 +14,7 @@ import org.knowbase.Vbox2;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Optional;
 
 public class BrowsingTab {
