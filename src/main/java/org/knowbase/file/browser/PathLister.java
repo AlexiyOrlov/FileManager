@@ -59,8 +59,18 @@ public class PathLister implements EventHandler<ActionEvent> {
                             {
                                 File file=new File(browsingTab.currnetDirectory.toFile(),text.getText());
                                 try {
-                                    Desktop.getDesktop().open(file);
-                                } catch (IOException e) {
+                                    if(Desktop.isDesktopSupported())
+                                        new Thread(() -> {
+                                            try {
+                                                Desktop.getDesktop().open(file);
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }).start();
+                                    else{
+                                        new Alert2(Alert.AlertType.ERROR,"Desktop is unsupported on this platform").show();
+                                    }
+                                } catch (Exception e) {
                                     try {
                                         String filename=text.getText();
                                         String mime=Files.probeContentType(file.toPath());
