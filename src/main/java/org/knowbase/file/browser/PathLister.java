@@ -9,11 +9,13 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import org.knowbase.Alert2;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +32,6 @@ public class PathLister implements EventHandler<ActionEvent> {
     public void handle(ActionEvent event) {
         try {
             List<Path> children= Files.list(path).collect(Collectors.toList());
-
                 browsingTab.currnetDirectory=path;
                 browsingTab.tab.setText(path.toString());
                     browsingTab.getElementPane().getChildren().clear();
@@ -53,6 +54,32 @@ public class PathLister implements EventHandler<ActionEvent> {
                     else{
                         Text text=new Text(ch.getFileName().toString());
                         browsingTab.getElementPane().getChildren().add(text);
+                        text.setOnMouseClicked(mouseEvent -> {
+                            if(mouseEvent.getClickCount()==2)
+                            {
+                                File file=new File(browsingTab.currnetDirectory.toFile(),text.getText());
+                                try {
+                                    Desktop.getDesktop().open(file);
+                                } catch (IOException e) {
+                                    try {
+                                        String filename=text.getText();
+                                        String mime=Files.probeContentType(file.toPath());
+                                        if(mime!=null)
+                                        {
+                                            new Alert2(Alert.AlertType.INFORMATION,"Operating system couldn't " +
+                                                    "recognise this file type - "+mime).show();
+                                        }
+                                        else{
+                                            String extension=filename.substring(filename.lastIndexOf('.'));
+                                            new Alert2(Alert.AlertType.INFORMATION,"Operating system couldn't " +
+                                                    "recognize this file type - "+extension).show();
+                                        }
+                                    } catch (IOException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                }
+                            }
+                        });
                     }
                 });
 
@@ -61,6 +88,10 @@ public class PathLister implements EventHandler<ActionEvent> {
         {
             Alert2 alert2=new Alert2(Alert.AlertType.WARNING,"Access to "+ac.getMessage()+"\n is denied");
             alert2.show();
+        }
+        catch (FileSystemException f)
+        {
+            new Alert2(Alert.AlertType.WARNING,f.getMessage()).show();
         }
         catch (IOException e) {
             e.printStackTrace();

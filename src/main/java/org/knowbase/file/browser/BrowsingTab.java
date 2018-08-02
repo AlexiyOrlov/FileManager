@@ -1,23 +1,15 @@
 package org.knowbase.file.browser;
 
-import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.text.Text;
 import org.knowbase.Alert2;
 import org.knowbase.Dialog2;
 import org.knowbase.Vbox2;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileSystemException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class BrowsingTab {
 
@@ -40,21 +32,7 @@ public class BrowsingTab {
         tab.setContent(container);
         tab.setClosable(true);
         try {
-            List<Path> paths= Files.list(path).collect(Collectors.toList());
-
-            paths.forEach(p ->{
-                if(Files.isDirectory(p, LinkOption.NOFOLLOW_LINKS))
-                {
-                    Button button=new Button(p.getFileName().toString());
-                    button.setOnAction(new PathLister(p,this));
-                    button.setOnContextMenuRequested(new DirectoryContextMenu(p));
-                    elementPane.getChildren().add(button);
-                }
-                else{
-                    Text text=new Text(p.getFileName().toString());
-                    elementPane.getChildren().add(text);
-                }
-            });
+            new PathLister(path,this).handle(null);
             Button goUp=new Button("Upwards");
             goUp.setOnAction(event -> {
                 if(currnetDirectory.getParent()==null)
@@ -96,15 +74,13 @@ public class BrowsingTab {
             FileBrowser.TAB_PANE.getTabs().add(tab);
             FileBrowser.TAB_PANE.getSelectionModel().select(tab);
         }
-        catch (FileSystemException f)
+        catch (Exception f)
         {
             String message=f.getMessage();
             Alert2 warn=new Alert2(Alert.AlertType.WARNING,message);
             warn.show();
         }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
     public Vbox2 getContainer() {
