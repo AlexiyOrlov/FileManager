@@ -58,16 +58,9 @@ public class BrowsingTab {
                 if(toSearch.isPresent() && !toSearch.get().isEmpty())
                 {
                     String tosearch=toSearch.get();
-                    FileSearch fileSearch=new FileSearch(currnetDirectory,checkinsides.isSelected(),tosearch);
+                    FileSearch fileSearch=new FileSearch(currnetDirectory,checkinsides.isSelected(),tosearch, container);
                     textSearchThread=new Thread(fileSearch);
                     textSearchThread.start();
-                    Button stopthread=new Button("Stop search");
-                    stopthread.setOnAction(event1 -> {
-                        if(textSearchThread!=null)
-                            textSearchThread.interrupt();
-                        container.getChildren().remove(stopthread);
-                    });
-                    container.getChildren().add(stopthread);
                 }
             });
             container.getChildren().addAll(goUp,search);

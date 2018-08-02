@@ -67,12 +67,12 @@ public class PathLister implements EventHandler<ActionEvent> {
                                         if(mime!=null)
                                         {
                                             new Alert2(Alert.AlertType.INFORMATION,"Operating system couldn't " +
-                                                    "recognise this file type - "+mime).show();
+                                                    "determine application for - "+mime).show();
                                         }
                                         else{
                                             String extension=filename.substring(filename.lastIndexOf('.'));
                                             new Alert2(Alert.AlertType.INFORMATION,"Operating system couldn't " +
-                                                    "recognize this file type - "+extension).show();
+                                                    "determine application for - "+extension).show();
                                         }
                                     } catch (IOException e1) {
                                         e1.printStackTrace();
