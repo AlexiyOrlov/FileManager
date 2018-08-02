@@ -1,5 +1,6 @@
 package org.knowbase.file.browser;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
@@ -8,6 +9,7 @@ import org.knowbase.Dialog2;
 import org.knowbase.Vbox2;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -29,6 +31,8 @@ public class BrowsingTab {
         elementPane=new FlowPane(Orientation.VERTICAL,10,10);
         elementPane.setPrefHeight(FileBrowser.MAXIMUM_BOUNDS.getHeight()/2);
         container=new Vbox2(scrollPane=new ScrollPane(elementPane));
+        container.setPadding(new Insets(0,6,6,6));
+        scrollPane.setPadding(new Insets(6));
         tab.setContent(container);
         tab.setClosable(true);
         try {
@@ -66,6 +70,7 @@ public class BrowsingTab {
             container.getChildren().addAll(goUp,search);
             FileBrowser.TAB_PANE.getTabs().add(tab);
             FileBrowser.TAB_PANE.getSelectionModel().select(tab);
+            FileBrowser.browsingTabs.add(new WeakReference<>(this));
         }
         catch (Exception f)
         {
@@ -78,6 +83,10 @@ public class BrowsingTab {
 
     public Vbox2 getContainer() {
         return container;
+    }
+
+    public ScrollPane getScrollPane() {
+        return scrollPane;
     }
 
     public FlowPane getElementPane() {

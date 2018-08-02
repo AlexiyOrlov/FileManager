@@ -3,11 +3,9 @@ package org.knowbase.file.browser;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import org.knowbase.Alert2;
 import org.knowbase.tools.Methods;
@@ -19,9 +17,13 @@ import java.util.Optional;
 public class DirectoryContextMenu implements EventHandler<ContextMenuEvent> {
 
     private Path directory;
+    private Button associatedButton;
+    private FlowPane flowPane;
 
-    DirectoryContextMenu(Path directory) {
+    DirectoryContextMenu(Path directory, Button button, FlowPane elementPane) {
         this.directory = directory;
+        associatedButton=button;
+        flowPane=elementPane;
     }
 
     @Override
@@ -34,7 +36,9 @@ public class DirectoryContextMenu implements EventHandler<ContextMenuEvent> {
             Optional<ButtonType> optionalButtonType=alert2.showAndWait();
             if(optionalButtonType.isPresent() && optionalButtonType.get()==ButtonType.OK)
             {
-                System.out.println("deleting "+directory);
+                Methods.delete(directory);
+                flowPane.getChildren().remove(associatedButton);
+
             }
         });
         ContextMenu contextMenu=new ContextMenu(delete);

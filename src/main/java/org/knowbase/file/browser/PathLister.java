@@ -32,66 +32,66 @@ public class PathLister implements EventHandler<ActionEvent> {
     public void handle(ActionEvent event) {
         try {
             List<Path> children= Files.list(path).collect(Collectors.toList());
-                browsingTab.currnetDirectory=path;
-                browsingTab.tab.setText(path.toString());
-                    browsingTab.getElementPane().getChildren().clear();
-                if(children.isEmpty())
-                {
-                    Label label=new Label("Directory is empty");
-                    label.setFont(new Font(16));
-                    browsingTab.getElementPane().getChildren().add(label);
+            browsingTab.currnetDirectory=path;
+            browsingTab.tab.setText(path.toString());
+            browsingTab.getElementPane().getChildren().clear();
+            if(children.isEmpty())
+            {
+                Label label=new Label("Directory is empty");
+                label.setFont(new Font(16));
+                browsingTab.getElementPane().getChildren().add(label);
+            }
+
+            children.forEach(ch -> {
+                if (Files.isDirectory(ch)) {
+                    Button button = new Button(ch.getFileName().toString());
+                    button.setOnAction(new PathLister(ch, browsingTab));
+                    button.setOnContextMenuRequested(new DirectoryContextMenu(ch,button,browsingTab.getElementPane()));
+                    browsingTab.getElementPane().getChildren().add(button);
                 }
                 else{
-                    children.sort(new FileSorter());
-                }
-                children.forEach(ch -> {
-                    if (Files.isDirectory(ch)) {
-                        Button button = new Button(ch.getFileName().toString());
-                        button.setOnAction(new PathLister(ch, browsingTab));
-                        button.setOnContextMenuRequested(new DirectoryContextMenu(ch));
-                        browsingTab.getElementPane().getChildren().add(button);
-                    }
-                    else{
-                        Text text=new Text(ch.getFileName().toString());
-                        browsingTab.getElementPane().getChildren().add(text);
-                        text.setOnMouseClicked(mouseEvent -> {
-                            if(mouseEvent.getClickCount()==2)
-                            {
-                                File file=new File(browsingTab.currnetDirectory.toFile(),text.getText());
+                    Text text=new Text(ch.getFileName().toString());
+                    browsingTab.getElementPane().getChildren().add(text);
+                    text.setOnContextMenuRequested(new FileContextMenu(ch, text, browsingTab));
+                    text.setOnMouseClicked(mouseEvent -> {
+                        if(mouseEvent.getClickCount()==2)
+                        {
+                            File file=new File(browsingTab.currnetDirectory.toFile(),text.getText());
+                            try {
+                                if(Desktop.isDesktopSupported())
+                                    new Thread(() -> {
+                                        try {
+                                            Desktop.getDesktop().open(file);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }).start();
+                                else{
+                                    new Alert2(Alert.AlertType.ERROR,"Desktop is unsupported on this platform").show();
+                                }
+                            } catch (Exception e) {
                                 try {
-                                    if(Desktop.isDesktopSupported())
-                                        new Thread(() -> {
-                                            try {
-                                                Desktop.getDesktop().open(file);
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }).start();
+                                    String mime=Files.probeContentType(file.toPath());
+                                    if(mime!=null)
+                                    {
+                                        new Alert2(Alert.AlertType.INFORMATION,"Operating system couldn't " +
+                                                "determine application for - "+mime).show();
+                                    }
                                     else{
-                                        new Alert2(Alert.AlertType.ERROR,"Desktop is unsupported on this platform").show();
-                                    }
-                                } catch (Exception e) {
-                                    try {
                                         String filename=text.getText();
-                                        String mime=Files.probeContentType(file.toPath());
-                                        if(mime!=null)
-                                        {
-                                            new Alert2(Alert.AlertType.INFORMATION,"Operating system couldn't " +
-                                                    "determine application for - "+mime).show();
-                                        }
-                                        else{
-                                            String extension=filename.substring(filename.lastIndexOf('.'));
-                                            new Alert2(Alert.AlertType.INFORMATION,"Operating system couldn't " +
-                                                    "determine application for - "+extension).show();
-                                        }
-                                    } catch (IOException e1) {
-                                        e1.printStackTrace();
+                                        String extension=filename.substring(filename.lastIndexOf('.'));
+                                        new Alert2(Alert.AlertType.INFORMATION,"Operating system couldn't " +
+                                                "determine application for - "+extension).show();
                                     }
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
                                 }
                             }
-                        });
-                    }
-                });
+                        }
+                    });
+                }
+            });
+            FileBrowser.handleSorting(browsingTab);
 
         }
         catch (AccessDeniedException ac)

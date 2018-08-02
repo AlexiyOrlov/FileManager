@@ -1,17 +1,18 @@
 package org.knowbase.file.browser;
 
+import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Tab;
+import org.knowbase.Hbox2;
 import org.knowbase.Vbox2;
 import org.knowbase.tools.Methods;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,16 +35,24 @@ public class FileSearch extends Task<List<Path>> {
             stopButton=new Button("Stop search");
             stopButton.setOnAction(event1 -> {
                 container.getChildren().remove(stopButton);
+                container.getChildren().remove(progressBar);
                 cancel();
             });
             progressBar.progressProperty().bind(progressProperty());
+            progressBar.setPrefWidth(FileBrowser.MAXIMUM_BOUNDS.getWidth()/2);
             container.getChildren().add(progressBar);
             container.getChildren().add(stopButton);
 
         });
+
         setOnSucceeded(event -> {
             List<Path> pathList= (List<Path>) event.getSource().getValue();
-            pathList.forEach(System.out::println);
+            pathList.sort(null);
+            Tab tab=new Tab("Search results ("+in.toString()+"):");
+            ListView<Path> listView=new ListView<>(FXCollections.observableArrayList(pathList));
+            tab.setContent(listView);
+            FileBrowser.TAB_PANE.getTabs().add(tab);
+
             container.getChildren().remove(progressBar);
             container.getChildren().remove(stopButton);
         });
@@ -51,6 +60,7 @@ public class FileSearch extends Task<List<Path>> {
             container.getChildren().remove(progressBar);
             container.getChildren().remove(stopButton);
         });
+
     }
 
     @Override
@@ -78,6 +88,8 @@ public class FileSearch extends Task<List<Path>> {
             }
             progress++;
             updateProgress(progress,fileMaount);
+            if(isCancelled())
+                break;
         }
         return applicable;
     }
