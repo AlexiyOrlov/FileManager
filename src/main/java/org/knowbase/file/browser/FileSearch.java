@@ -23,23 +23,24 @@ public class FileSearch extends Task<List<Path>> {
     private String argument;
     private Button stopButton;
     private ProgressBar progressBar;
+    private Label stateMessage;
 
     public FileSearch(Path in, boolean scanInside, String argument, Pane container) {
         this.in = in;
         this.scanInside = scanInside;
         this.argument = argument;
         progressBar=new ProgressBar(0);
+        stateMessage=new Label();
+        stateMessage.textProperty().bind(messageProperty());
         setOnScheduled(event -> {
             stopButton=new Button("Abort search");
             stopButton.setOnAction(event1 -> {
-                container.getChildren().remove(stopButton);
-                container.getChildren().remove(progressBar);
+                removeNodes(container);
                 cancel();
             });
             progressBar.progressProperty().bind(progressProperty());
             progressBar.setPrefWidth(FileBrowser.MAXIMUM_BOUNDS.getWidth()/2);
-            container.getChildren().add(progressBar);
-            container.getChildren().add(stopButton);
+            addNodes(container);
 
         });
 
@@ -61,22 +62,20 @@ public class FileSearch extends Task<List<Path>> {
             tab.setContent(listView);
             FileBrowser.TAB_PANE.getTabs().add(tab);
 
-            container.getChildren().remove(progressBar);
-            container.getChildren().remove(stopButton);
+            removeNodes(container);
         });
-        setOnFailed(event -> {
-            container.getChildren().remove(progressBar);
-            container.getChildren().remove(stopButton);
-        });
+        setOnFailed(event -> removeNodes(container));
 
     }
 
     @Override
     protected List<Path> call() {
         List<Path> applicable=new ArrayList<>();
+        updateMessage("Parsing files");
         List<Path> pathList= Methods.getFiles(in,new ArrayList<>());
         int fileMaount=pathList.size();
         int progress=0;
+        updateMessage("Searching");
         for (Path path : pathList) {
             try {
                 if (scanInside) {
@@ -101,4 +100,20 @@ public class FileSearch extends Task<List<Path>> {
         }
         return applicable;
     }
+
+    private void addNodes(Pane pane)
+    {
+        pane.getChildren().add(stateMessage);
+        pane.getChildren().add(progressBar);
+        pane.getChildren().add(stopButton);
+    }
+
+    private void removeNodes(Pane pane)
+    {
+
+        pane.getChildren().remove(progressBar);
+        pane.getChildren().remove(stopButton);
+        pane.getChildren().remove(stateMessage);
+    }
+
 }
