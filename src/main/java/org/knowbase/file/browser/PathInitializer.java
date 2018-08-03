@@ -1,5 +1,6 @@
 package org.knowbase.file.browser;
 
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -65,34 +66,39 @@ public class PathInitializer implements EventHandler<MouseEvent> {
                             }
                             if (mouseEvent.getClickCount() == 2) {
                                 File file = new File(browsingTab.currnetDirectory.toFile(), text.getText());
-                                try {
+
                                     if (Desktop.isDesktopSupported())
                                         new Thread(() -> {
                                             try {
                                                 Desktop.getDesktop().open(file);
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
+                                            }
+                                            catch (Exception e) {
+                                                try {
+                                                    String mime = Files.probeContentType(file.toPath());
+                                                    if (mime != null) {
+                                                        Platform.runLater(() -> new Alert2(Alert.AlertType.INFORMATION, "Operating system couldn't " +
+                                                                "determine application for - " + mime).show());
+                                                    } else {
+                                                        String filename = text.getText();
+                                                        if(filename.contains(".")) {
+                                                            String extension = filename.substring(filename.lastIndexOf('.'));
+                                                            Platform.runLater(() -> new Alert2(Alert.AlertType.INFORMATION, "Operating system couldn't " +
+                                                                    "determine application for - " + extension).show());
+                                                        }
+                                                        else{
+                                                            Platform.runLater(() -> new Alert2(Alert.AlertType.INFORMATION,"Operating " +
+                                                                    "system can't open "+filename).show());
+                                                        }
+                                                    }
+                                                } catch (IOException e1) {
+                                                    e1.printStackTrace();
+                                                }
                                             }
                                         }).start();
                                     else {
                                         new Alert2(Alert.AlertType.ERROR, "Desktop is unsupported on this platform").show();
                                     }
-                                } catch (Exception e) {
-                                    try {
-                                        String mime = Files.probeContentType(file.toPath());
-                                        if (mime != null) {
-                                            new Alert2(Alert.AlertType.INFORMATION, "Operating system couldn't " +
-                                                    "determine application for - " + mime).show();
-                                        } else {
-                                            String filename = text.getText();
-                                            String extension = filename.substring(filename.lastIndexOf('.'));
-                                            new Alert2(Alert.AlertType.INFORMATION, "Operating system couldn't " +
-                                                    "determine application for - " + extension).show();
-                                        }
-                                    } catch (IOException e1) {
-                                        e1.printStackTrace();
-                                    }
-                                }
+
                             }
                         });
                     }
