@@ -1,16 +1,12 @@
 package org.knowbase.file.browser;
 
-import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.FlowPane;
-import javafx.stage.Stage;
 import org.knowbase.Alert2;
 import org.knowbase.tools.Methods;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -19,11 +15,13 @@ public class DirectoryContextMenu implements EventHandler<ContextMenuEvent> {
     private Path directory;
     private Button associatedButton;
     private FlowPane flowPane;
+    private BrowsingTab browsingTab;
 
-    DirectoryContextMenu(Path directory, Button button, FlowPane elementPane) {
+    DirectoryContextMenu(Path directory, Button button, BrowsingTab tab) {
         this.directory = directory;
         associatedButton=button;
-        flowPane=elementPane;
+        flowPane=tab.getElementPane();
+        browsingTab=tab;
     }
 
     @Override
@@ -38,10 +36,12 @@ public class DirectoryContextMenu implements EventHandler<ContextMenuEvent> {
             {
                 Methods.delete(directory);
                 flowPane.getChildren().remove(associatedButton);
-
+                browsingTab.getScrollPane().requestLayout();
             }
         });
-        ContextMenu contextMenu=new ContextMenu(delete);
+        MenuItem info=new MenuItem("Show info");
+        info.setOnAction(new FileInformator(directory));
+        ContextMenu contextMenu=new ContextMenu(info,delete);
         contextMenu.show(FileBrowser.stage,event.getScreenX(),event.getScreenY());
     }
 }

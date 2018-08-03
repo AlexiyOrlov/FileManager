@@ -78,6 +78,7 @@ public class FileContextMenu implements EventHandler<ContextMenuEvent> {
             File dir=directoryChooser.showDialog(FileBrowser.stage);
             if(dir!=null)
             {
+                FileBrowser.SETTINGS.put(FileBrowser.LAST_DIRECTORY,dir.getAbsolutePath());
                 try {
                     Files.copy(file,dir.toPath().resolve(file.getFileName()));
                 } catch (IOException e) {
@@ -86,55 +87,7 @@ public class FileContextMenu implements EventHandler<ContextMenuEvent> {
             }
         });
         MenuItem info=new MenuItem("Show info");
-        info.setOnAction(event1 -> {
-            Dialog2<Object,Vbox2> dialog2=new Dialog2<>(file.getFileName()+" info",new Vbox2(), Modality.NONE,ButtonType.CLOSE);
-            ObservableList<Node> observableList=dialog2.getContainer().getChildren();
-            if(Files.isReadable(file))
-            {
-                try {
-                    long size=Files.size(file);
-                    Label label;
-                    if(size>=Math.pow(1024,3))
-                    {
-                        label=new Label("Size: "+(size/Math.pow(1024,3))+" GiB");
-                    }
-                    else if(size>=1024*1024)
-                    {
-                        label=new Label("Size: "+(size/(1024*1024))+ " MiB");
-                    }
-                    else if(size>=1024)
-                    {
-                        label=new Label("Size: "+size/1024+" KiB");
-                    }
-                    else label=new Label("Size: "+size+" bytes");
-                    observableList.add(label);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if(Files.isWritable(file))
-                {
-                    observableList.add(new Label("Writeable"));
-                }
-                try {
-                    FileTime lastModTime=Files.getLastModifiedTime(file, LinkOption.NOFOLLOW_LINKS);
-                    observableList.add(new Label("Modified: "+lastModTime.toString()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    if(Files.isHidden(file))
-                        observableList.add(new Label("Hidden"));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if(Files.isExecutable(file))
-                    observableList.add(new Label("Executable"));
-            }
-            else{
-                observableList.add(new Label("No permission to read this file"));
-            }
-            dialog2.show();
-        });
+        info.setOnAction(new FileInformator(file));
 
         ContextMenu contextMenu=new ContextMenu(info,rename,copy,delete);
         contextMenu.show(FileBrowser.stage,event.getScreenX(),event.getScreenY());

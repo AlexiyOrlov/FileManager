@@ -5,8 +5,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -50,7 +48,7 @@ public class PathInitializer implements EventHandler<MouseEvent> {
                         Button button = new Button(ch.getFileName().toString());
                         button.setOnMouseClicked(new PathInitializer(ch, browsingTab));
 
-                        button.setOnContextMenuRequested(new DirectoryContextMenu(ch, button, browsingTab.getElementPane()));
+                        button.setOnContextMenuRequested(new DirectoryContextMenu(ch, button, browsingTab));
                         browsingTab.getElementPane().getChildren().add(button);
                     } else {
                         Text text = new Text(ch.getFileName().toString());
