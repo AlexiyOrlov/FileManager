@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
+import javafx.scene.layout.Pane;
 import org.knowbase.Hbox2;
 import org.knowbase.Vbox2;
 import org.knowbase.tools.Methods;
@@ -26,13 +27,13 @@ public class FileSearch extends Task<List<Path>> {
     private Button stopButton;
     private ProgressBar progressBar;
 
-    public FileSearch(Path in, boolean scanInside, String argument, Vbox2 container) {
+    public FileSearch(Path in, boolean scanInside, String argument, Pane container) {
         this.in = in;
         this.scanInside = scanInside;
         this.argument = argument;
         progressBar=new ProgressBar(0);
         setOnScheduled(event -> {
-            stopButton=new Button("Stop search");
+            stopButton=new Button("Abort search");
             stopButton.setOnAction(event1 -> {
                 container.getChildren().remove(stopButton);
                 container.getChildren().remove(progressBar);

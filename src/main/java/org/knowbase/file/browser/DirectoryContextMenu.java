@@ -28,7 +28,7 @@ public class DirectoryContextMenu implements EventHandler<ContextMenuEvent> {
 
     @Override
     public void handle(ContextMenuEvent event) {
-        Stage stage=FileBrowser.stage;
+
         MenuItem delete=new MenuItem("Delete");
         delete.setOnAction(e -> {
             Alert2 alert2=new Alert2(Alert.AlertType.CONFIRMATION,"Do you want to permanently delete "+
@@ -42,6 +42,6 @@ public class DirectoryContextMenu implements EventHandler<ContextMenuEvent> {
             }
         });
         ContextMenu contextMenu=new ContextMenu(delete);
-        contextMenu.show(stage,event.getScreenX(),event.getScreenY());
+        contextMenu.show(FileBrowser.stage,event.getScreenX(),event.getScreenY());
     }
 }

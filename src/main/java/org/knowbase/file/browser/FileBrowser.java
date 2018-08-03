@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class FileBrowser extends Application {
 
@@ -33,7 +34,8 @@ public class FileBrowser extends Application {
     static TabPane TAB_PANE;
     static FileSort fileSort;
     static ArrayList<WeakReference<BrowsingTab>> browsingTabs;
-    private final static String SETTING_FILE="settings.txt", LAST_DIRECTORY="last_directory", FILE_SORTING="file_sorting_type";
+    private final static String SETTING_FILE="settings.txt";
+    public static String LAST_DIRECTORY="last_directory", FILE_SORTING="file_sorting_type";
     @Override
     public void start(Stage primaryStage)   {
         MAXIMUM_BOUNDS= Screen.getPrimary().getVisualBounds();

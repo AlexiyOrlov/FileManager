@@ -1,10 +1,7 @@
 package org.knowbase.file.browser;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import org.knowbase.Alert2;
@@ -14,7 +11,6 @@ import org.knowbase.Vbox2;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Optional;
 
 public class BrowsingTab {
@@ -24,6 +20,7 @@ public class BrowsingTab {
     private FlowPane elementPane;
     private Thread textSearchThread;
     private ScrollPane scrollPane;
+    private FlowPane bottomContainer;
     Path currnetDirectory;
     public BrowsingTab(File directory) {
         this(directory.toPath());
@@ -34,13 +31,14 @@ public class BrowsingTab {
         currnetDirectory=path;
         elementPane=new FlowPane(Orientation.VERTICAL,10,10);
         elementPane.setPrefHeight(FileBrowser.MAXIMUM_BOUNDS.getHeight()/2);
-        container=new Vbox2(scrollPane=new ScrollPane(elementPane));
+        bottomContainer=new FlowPane(Orientation.VERTICAL,10,10);
+        container=new Vbox2(scrollPane=new ScrollPane(elementPane),bottomContainer);
         container.setPadding(new Insets(0,6,6,6));
         scrollPane.setPadding(new Insets(6));
         tab.setContent(container);
         tab.setClosable(true);
         try {
-            new PathLister(path,this).handle(null);
+            new PathInitializer(path,this).handle(null);
             Button goUp=new Button("Upwards");
             goUp.setOnAction(event -> {
                 if(currnetDirectory.getParent()==null)
@@ -50,13 +48,13 @@ public class BrowsingTab {
                 else{
                     currnetDirectory=currnetDirectory.getParent();
                     tab.setText(currnetDirectory.toString());
-                    new PathLister(currnetDirectory,this).handle(null);
+                    new PathInitializer(currnetDirectory,this).handle(null);
                 }
             });
             Button search=new Button("Search");
             search.setOnAction(event -> {
                 Vbox2 vbox2=new Vbox2();
-                Dialog2<String> dialog2=new Dialog2<>("What to search?",vbox2,null,ButtonType.APPLY,ButtonType.CANCEL);
+                Dialog2<String,Vbox2> dialog2=new Dialog2<>("What to search?",vbox2,null,ButtonType.APPLY,ButtonType.CANCEL);
                 CheckBox checkinsides=new CheckBox("Check contents");
                 vbox2.getChildren().add(checkinsides);
                 TextField argument=new TextField();
@@ -66,12 +64,14 @@ public class BrowsingTab {
                 if(toSearch.isPresent() && !toSearch.get().isEmpty())
                 {
                     String tosearch=toSearch.get();
-                    FileSearch fileSearch=new FileSearch(currnetDirectory,checkinsides.isSelected(),tosearch, container);
+                    FileSearch fileSearch=new FileSearch(currnetDirectory,checkinsides.isSelected(),tosearch, bottomContainer);
                     textSearchThread=new Thread(fileSearch);
                     textSearchThread.start();
                 }
             });
-            container.getChildren().addAll(goUp,search);
+            Button synchronize=new Button("Synchronize");
+            synchronize.setOnAction(event -> new PathInitializer(currnetDirectory,this).handle(null));
+            bottomContainer.getChildren().addAll(goUp,search,synchronize);
             FileBrowser.TAB_PANE.getTabs().add(tab);
             FileBrowser.TAB_PANE.getSelectionModel().select(tab);
             FileBrowser.browsingTabs.add(new WeakReference<>(this));
@@ -83,10 +83,6 @@ public class BrowsingTab {
             warn.show();
         }
 
-    }
-
-    public Vbox2 getContainer() {
-        return container;
     }
 
     public ScrollPane getScrollPane() {

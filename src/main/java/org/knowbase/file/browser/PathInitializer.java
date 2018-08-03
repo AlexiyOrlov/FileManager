@@ -1,11 +1,13 @@
 package org.knowbase.file.browser;
 
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import org.knowbase.Alert2;
@@ -20,11 +22,11 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PathLister implements EventHandler<MouseEvent> {
+public class PathInitializer implements EventHandler<MouseEvent> {
 
     private Path path;
     private BrowsingTab browsingTab;
-    PathLister(Path path,BrowsingTab tab) {
+    PathInitializer(Path path, BrowsingTab tab) {
         this.path = path;
         browsingTab=tab;
     }
@@ -46,15 +48,23 @@ public class PathLister implements EventHandler<MouseEvent> {
                 children.forEach(ch -> {
                     if (Files.isDirectory(ch)) {
                         Button button = new Button(ch.getFileName().toString());
-                        button.setOnMouseClicked(new PathLister(ch, browsingTab));
+                        button.setOnMouseClicked(new PathInitializer(ch, browsingTab));
 
                         button.setOnContextMenuRequested(new DirectoryContextMenu(ch, button, browsingTab.getElementPane()));
                         browsingTab.getElementPane().getChildren().add(button);
                     } else {
                         Text text = new Text(ch.getFileName().toString());
+                        if(Files.isSymbolicLink(ch))
+                            text.setFill(Color.RED);
                         browsingTab.getElementPane().getChildren().add(text);
                         text.setOnContextMenuRequested(new FileContextMenu(ch, text, browsingTab));
+                        text.setOnMouseEntered(event1 -> text.setUnderline(true));
+                        text.setOnMouseExited(event1 -> text.setUnderline(false));
                         text.setOnMouseClicked(mouseEvent -> {
+                            if(mouseEvent.isControlDown())
+                            {
+
+                            }
                             if (mouseEvent.getClickCount() == 2) {
                                 File file = new File(browsingTab.currnetDirectory.toFile(), text.getText());
                                 try {
