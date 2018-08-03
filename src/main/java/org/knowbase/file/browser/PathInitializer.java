@@ -60,10 +60,6 @@ public class PathInitializer implements EventHandler<MouseEvent> {
                         text.setOnMouseEntered(event1 -> text.setUnderline(true));
                         text.setOnMouseExited(event1 -> text.setUnderline(false));
                         text.setOnMouseClicked(mouseEvent -> {
-                            if(mouseEvent.isControlDown())
-                            {
-
-                            }
                             if (mouseEvent.getClickCount() == 2) {
                                 File file = new File(browsingTab.currentDirectory.toFile(), text.getText());
                                 launchWithDefaultApplication(file);
@@ -72,6 +68,7 @@ public class PathInitializer implements EventHandler<MouseEvent> {
                     }
                 });
                 FileBrowser.handleSorting(browsingTab);
+                browsingTab.getScrollPane().setVvalue(0);
 
             } catch (AccessDeniedException ac) {
                 Alert2 alert2 = new Alert2(Alert.AlertType.WARNING, "Access to " + ac.getMessage() + "\n is denied");

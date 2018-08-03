@@ -61,6 +61,7 @@ public class FileSearch extends Task<List<Path>> {
             });
             tab.setContent(listView);
             FileBrowser.TAB_PANE.getTabs().add(tab);
+            FileBrowser.TAB_PANE.getSelectionModel().select(tab);
 
             removeNodes(container);
         });
