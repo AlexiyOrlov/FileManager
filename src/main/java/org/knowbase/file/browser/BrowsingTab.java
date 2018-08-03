@@ -21,14 +21,17 @@ public class BrowsingTab {
     private Thread textSearchThread;
     private ScrollPane scrollPane;
     private FlowPane bottomContainer;
-    Path currnetDirectory;
+    Path currentDirectory;
     public BrowsingTab(File directory) {
         this(directory.toPath());
     }
 
+    /**
+     * Creates a new file browsing tab
+     */
     public BrowsingTab(Path path) {
         tab=new Tab(path.getFileName()==null ? path.toString() : path.getFileName().toString());
-        currnetDirectory=path;
+        currentDirectory =path;
         elementPane=new FlowPane(Orientation.VERTICAL,10,10);
         elementPane.setPrefHeight(FileBrowser.MAXIMUM_BOUNDS.getHeight()/2);
         bottomContainer=new FlowPane(Orientation.VERTICAL,10,10);
@@ -41,14 +44,14 @@ public class BrowsingTab {
             new PathInitializer(path,this).handle(null);
             Button goUp=new Button("Upwards");
             goUp.setOnAction(event -> {
-                if(currnetDirectory.getParent()==null)
+                if(currentDirectory.getParent()==null)
                 {
                     new Alert2(Alert.AlertType.INFORMATION,path.toString()+" has no parent").show();
                 }
                 else{
-                    currnetDirectory=currnetDirectory.getParent();
-                    tab.setText(currnetDirectory.toString());
-                    new PathInitializer(currnetDirectory,this).handle(null);
+                    currentDirectory = currentDirectory.getParent();
+                    tab.setText(currentDirectory.toString());
+                    new PathInitializer(currentDirectory,this).handle(null);
                 }
             });
             Button search=new Button("Search");
@@ -64,13 +67,13 @@ public class BrowsingTab {
                 if(toSearch.isPresent() && !toSearch.get().isEmpty())
                 {
                     String tosearch=toSearch.get();
-                    FileSearch fileSearch=new FileSearch(currnetDirectory,checkinsides.isSelected(),tosearch, bottomContainer);
+                    FileSearch fileSearch=new FileSearch(currentDirectory,checkinsides.isSelected(),tosearch, bottomContainer);
                     textSearchThread=new Thread(fileSearch);
                     textSearchThread.start();
                 }
             });
             Button synchronize=new Button("Synchronize");
-            synchronize.setOnAction(event -> new PathInitializer(currnetDirectory,this).handle(null));
+            synchronize.setOnAction(event -> new PathInitializer(currentDirectory,this).handle(null));
             bottomContainer.getChildren().addAll(goUp,search,synchronize);
             FileBrowser.TAB_PANE.getTabs().add(tab);
             FileBrowser.TAB_PANE.getSelectionModel().select(tab);

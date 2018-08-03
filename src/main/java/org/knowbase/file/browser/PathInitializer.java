@@ -35,7 +35,7 @@ public class PathInitializer implements EventHandler<MouseEvent> {
         if(event==null || event.getClickCount()==2) {
             try {
                 List<Path> children = Files.list(path).collect(Collectors.toList());
-                browsingTab.currnetDirectory = path;
+                browsingTab.currentDirectory = path;
                 browsingTab.tab.setText(path.toString());
                 browsingTab.getElementPane().getChildren().clear();
                 if (children.isEmpty()) {
@@ -65,40 +65,8 @@ public class PathInitializer implements EventHandler<MouseEvent> {
 
                             }
                             if (mouseEvent.getClickCount() == 2) {
-                                File file = new File(browsingTab.currnetDirectory.toFile(), text.getText());
-
-                                    if (Desktop.isDesktopSupported())
-                                        new Thread(() -> {
-                                            try {
-                                                Desktop.getDesktop().open(file);
-                                            }
-                                            catch (Exception e) {
-                                                try {
-                                                    String mime = Files.probeContentType(file.toPath());
-                                                    if (mime != null) {
-                                                        Platform.runLater(() -> new Alert2(Alert.AlertType.INFORMATION, "Operating system couldn't " +
-                                                                "determine application for - " + mime).show());
-                                                    } else {
-                                                        String filename = text.getText();
-                                                        if(filename.contains(".")) {
-                                                            String extension = filename.substring(filename.lastIndexOf('.'));
-                                                            Platform.runLater(() -> new Alert2(Alert.AlertType.INFORMATION, "Operating system couldn't " +
-                                                                    "determine application for - " + extension).show());
-                                                        }
-                                                        else{
-                                                            Platform.runLater(() -> new Alert2(Alert.AlertType.INFORMATION,"Operating " +
-                                                                    "system can't open "+filename).show());
-                                                        }
-                                                    }
-                                                } catch (IOException e1) {
-                                                    e1.printStackTrace();
-                                                }
-                                            }
-                                        }).start();
-                                    else {
-                                        new Alert2(Alert.AlertType.ERROR, "Desktop is unsupported on this platform").show();
-                                    }
-
+                                File file = new File(browsingTab.currentDirectory.toFile(), text.getText());
+                                launchWithDefaultApplication(file);
                             }
                         });
                     }
@@ -114,5 +82,41 @@ public class PathInitializer implements EventHandler<MouseEvent> {
                 e.printStackTrace();
             }
         }
+    }
+
+    static void launchWithDefaultApplication(File file)
+    {
+        if (Desktop.isDesktopSupported())
+            new Thread(() -> {
+                try {
+                    Desktop.getDesktop().open(file);
+                }
+                catch (Exception e) {
+                    try {
+                        String mime = Files.probeContentType(file.toPath());
+                        if (mime != null) {
+                            Platform.runLater(() -> new Alert2(Alert.AlertType.INFORMATION, "Operating system couldn't " +
+                                    "determine application for - " + mime).show());
+                        } else {
+                            String filename = file.getName();
+                            if(filename.contains(".")) {
+                                String extension = filename.substring(filename.lastIndexOf('.'));
+                                Platform.runLater(() -> new Alert2(Alert.AlertType.INFORMATION, "Operating system couldn't " +
+                                        "determine application for " + extension).show());
+                            }
+                            else{
+                                Platform.runLater(() -> new Alert2(Alert.AlertType.INFORMATION,"Operating " +
+                                        "system can't open "+filename).show());
+                            }
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }).start();
+        else {
+            new Alert2(Alert.AlertType.ERROR, "Desktop is unsupported on this platform").show();
+        }
+
     }
 }

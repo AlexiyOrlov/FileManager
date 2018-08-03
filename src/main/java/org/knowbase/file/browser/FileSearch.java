@@ -2,10 +2,7 @@ package org.knowbase.file.browser;
 
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.Tab;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import org.knowbase.Hbox2;
 import org.knowbase.Vbox2;
@@ -51,6 +48,16 @@ public class FileSearch extends Task<List<Path>> {
             pathList.sort(null);
             Tab tab=new Tab("Search results ("+in.toString()+"):");
             ListView<Path> listView=new ListView<>(FXCollections.observableArrayList(pathList));
+            listView.setOnMouseClicked(event1 -> {
+                if(event1.getClickCount()==2)
+                    PathInitializer.launchWithDefaultApplication(listView.getSelectionModel().getSelectedItem().toFile());
+            });
+            listView.setOnContextMenuRequested(event1 -> {
+                MenuItem openParent=new MenuItem("Open location");
+                openParent.setOnAction(event2 -> new BrowsingTab(listView.getSelectionModel().getSelectedItem().getParent()));
+                ContextMenu contextMenu=new ContextMenu(openParent);
+                contextMenu.show(FileBrowser.stage,event1.getScreenX(),event1.getScreenY());
+            });
             tab.setContent(listView);
             FileBrowser.TAB_PANE.getTabs().add(tab);
 
