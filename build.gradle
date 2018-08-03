@@ -5,6 +5,15 @@ apply plugin: 'java'
 
 version '0.1'
 
+jar{
+    manifest{
+        attributes 'Main-Class' : 'org.knowbase.file.browser.FileBrowser'
+    }
+}
+
+shadowJar{
+    classifier='complete'
+}
 
 dependencies {
     compile rootProject
