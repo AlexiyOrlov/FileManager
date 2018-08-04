@@ -1,27 +1,21 @@
 package org.knowbase.file.browser;
 
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.Modality;
 import org.knowbase.Alert2;
-import org.knowbase.Dialog2;
-import org.knowbase.Vbox2;
 import org.knowbase.tools.Methods;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 8/2/18 by alexiy.
@@ -46,9 +40,17 @@ public class FileContextMenu implements EventHandler<ContextMenuEvent> {
             Optional<ButtonType> buttonType=confirm.showAndWait();
             if(buttonType.isPresent() && buttonType.get()==ButtonType.OK)
             {
-                Methods.delete(file);
-                tab.getElementPane().getChildren().remove(associatedControl);
-                tab.getScrollPane().requestLayout();
+                List<Path> denied=Methods.delete(file, new ArrayList<>());
+                if(denied.isEmpty())
+                {
+                    tab.getElementPane().getChildren().remove(associatedControl);
+                    tab.getScrollPane().requestLayout();
+                }
+                else{
+
+                    Alert2 alert2=new Alert2(Alert.AlertType.WARNING,"No access to this file");
+                    alert2.show();
+                }
             }
         });
         MenuItem rename=new MenuItem("Rename");

@@ -8,6 +8,8 @@ import org.knowbase.Alert2;
 import org.knowbase.tools.Methods;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class DirectoryContextMenu implements EventHandler<ContextMenuEvent> {
@@ -34,9 +36,19 @@ public class DirectoryContextMenu implements EventHandler<ContextMenuEvent> {
             Optional<ButtonType> optionalButtonType=alert2.showAndWait();
             if(optionalButtonType.isPresent() && optionalButtonType.get()==ButtonType.OK)
             {
-                Methods.delete(directory);
-                flowPane.getChildren().remove(associatedButton);
-                browsingTab.getScrollPane().requestLayout();
+
+                List<Path> denied=Methods.delete(directory, new ArrayList<>());
+                if(denied.isEmpty())
+                {
+                    browsingTab.getElementPane().getChildren().remove(associatedButton);
+                    browsingTab.getScrollPane().requestLayout();
+                }
+                else{
+                    StringBuilder stringBuilder=new StringBuilder("Couldn't delete files:\n");
+                    denied.forEach(path -> stringBuilder.append(path.toString()).append('\n'));
+                    Alert2 alert=new Alert2(Alert.AlertType.WARNING,stringBuilder.toString());
+                    alert.show();
+                }
             }
         });
         MenuItem info=new MenuItem("Show info");
