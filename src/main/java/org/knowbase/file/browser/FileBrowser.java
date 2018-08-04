@@ -101,8 +101,8 @@ public class FileBrowser extends Application {
                         return -1;
                     if (!(o1 instanceof Button) && o2 instanceof Button)
                         return 1;
-                    if (o1 instanceof Text && o2 instanceof Text)
-                        return ((Text) o1).getText().compareTo(((Text) o2).getText());
+                    if (o1 instanceof FMFile && o2 instanceof FMFile)
+                        return ((FMFile) o1).getName().compareTo(((FMFile) o2).getName());
                     if (o1 instanceof Button)
                         return ((Button) o1).getText().compareTo(((Button) o2).getText());
                     return 0;
@@ -121,9 +121,9 @@ public class FileBrowser extends Application {
                         return -1;
                     if (!(o1 instanceof Button) && o2 instanceof Button)
                         return 1;
-                    if (o1 instanceof Text && o2 instanceof Text) {
-                        String string = ((Text) o1).getText();
-                        String s2 = ((Text) o2).getText();
+                    if (o1 instanceof FMFile && o2 instanceof FMFile) {
+                        String string = ((FMFile) o1).getName();
+                        String s2 = ((FMFile) o2).getName();
                         if (string.contains(".") && s2.contains(".")) {
                             String ext = string.substring(string.lastIndexOf('.') + 1);
                             String e2 = s2.substring(s2.lastIndexOf('.') + 1);
@@ -144,10 +144,10 @@ public class FileBrowser extends Application {
                     if(i+1<nodes.size())
                     {
                         Node next=nodes.get(i+1);
-                        if(current instanceof Text && next instanceof Text)
+                        if(current instanceof FMFile && next instanceof FMFile)
                         {
-                            String t=((Text) current).getText();
-                            String text2=((Text) next).getText();
+                            String t=((FMFile) current).getName();
+                            String text2=((FMFile) next).getName();
                             if(t.contains(".") && text2.contains("."))
                             {
                                 String ext=t.substring(t.lastIndexOf('.')+1);

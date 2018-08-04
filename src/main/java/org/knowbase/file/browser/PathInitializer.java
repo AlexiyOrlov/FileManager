@@ -52,19 +52,7 @@ public class PathInitializer implements EventHandler<MouseEvent> {
                         button.setOnContextMenuRequested(new DirectoryContextMenu(ch, button, browsingTab));
                         browsingTab.getElementPane().getChildren().add(button);
                     } else {
-                        Text text = new Text(ch.getFileName().toString());
-                        if(Files.isSymbolicLink(ch))
-                            text.setFill(Color.RED);
-                        browsingTab.getElementPane().getChildren().add(text);
-                        text.setOnContextMenuRequested(new FileContextMenu(ch, text, browsingTab));
-                        text.setOnMouseEntered(event1 -> text.setUnderline(true));
-                        text.setOnMouseExited(event1 -> text.setUnderline(false));
-                        text.setOnMouseClicked(mouseEvent -> {
-                            if (mouseEvent.getClickCount() == 2) {
-                                File file = new File(browsingTab.currentDirectory.toFile(), text.getText());
-                                launchWithDefaultApplication(file);
-                            }
-                        });
+                        new FMFile(ch,browsingTab);
                     }
                 });
                 FileBrowser.handleSorting(browsingTab);

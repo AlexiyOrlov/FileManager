@@ -63,8 +63,8 @@ public class FileContextMenu implements EventHandler<ContextMenuEvent> {
                 String string=stringOptional.get();
                 try {
                     file=Files.copy(file, file.resolveSibling(string));
-                    if(associatedControl instanceof Text)
-                        ((Text) associatedControl).setText(string);
+                    if(associatedControl instanceof FMFile)
+                        ((FMFile) associatedControl).setText(string);
                     else if(associatedControl instanceof Button)
                         ((Button) associatedControl).setText(string);
                 } catch (IOException e) {
