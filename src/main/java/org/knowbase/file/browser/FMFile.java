@@ -23,7 +23,7 @@ public class FMFile extends StackPane{
         background=rectangle;
         getChildren().addAll(rectangle,name);
         setAlignment(Pos.CENTER_LEFT);
-        name.setOnContextMenuRequested(new FileContextMenu(file, name, owner));
+        name.setOnContextMenuRequested(new FileContextMenu(file, this, owner));
         name.setOnMouseEntered(event1 -> name.setUnderline(true));
         name.setOnMouseExited(event1 -> name.setUnderline(false));
         name.setOnMouseClicked(mouseEvent -> {

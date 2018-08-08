@@ -37,16 +37,16 @@ public class DirectoryContextMenu implements EventHandler<ContextMenuEvent> {
             if(optionalButtonType.isPresent() && optionalButtonType.get()==ButtonType.OK)
             {
 
-                List<Path> denied=Methods.delete(directory, new ArrayList<>());
-                if(denied.isEmpty())
+                boolean success=Methods.delete(directory);
+                if(success)
                 {
                     browsingTab.getElementPane().getChildren().remove(associatedButton);
                     browsingTab.getScrollPane().requestLayout();
                 }
                 else{
-                    StringBuilder stringBuilder=new StringBuilder("Couldn't delete files:\n");
-                    denied.forEach(path -> stringBuilder.append(path.toString()).append('\n'));
-                    Alert2 alert=new Alert2(Alert.AlertType.WARNING,stringBuilder.toString());
+//                    StringBuilder stringBuilder=new StringBuilder("Couldn't delete files:\n");
+//                    success.forEach(path -> stringBuilder.append(path.toString()).append('\n'));
+                    Alert2 alert=new Alert2(Alert.AlertType.WARNING,"Couldn't delete "+directory.toString());
                     alert.show();
                 }
             }

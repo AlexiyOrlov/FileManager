@@ -40,8 +40,8 @@ public class FileContextMenu implements EventHandler<ContextMenuEvent> {
             Optional<ButtonType> buttonType=confirm.showAndWait();
             if(buttonType.isPresent() && buttonType.get()==ButtonType.OK)
             {
-                List<Path> denied=Methods.delete(file, new ArrayList<>());
-                if(denied.isEmpty())
+                boolean success=Methods.delete(file);
+                if(success)
                 {
                     tab.getElementPane().getChildren().remove(associatedControl);
                     tab.getScrollPane().requestLayout();
